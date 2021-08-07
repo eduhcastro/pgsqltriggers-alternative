@@ -1,6 +1,6 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/skillerm/pgsqltriggers-alternative.git",
   "author": "Eduardo Castro <projecflex@gmail.com>",
@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node build/index.js",
     "dev": "ts-node-dev --ignore-watch node_modules index.ts",
-    "test": "ts-node-dev --ignore-watch node_modules create.test.ts"
+    "test": "ts-node-dev --ignore-watch node_modules test/create.test.ts"
   },
   "devDependencies": {
     "@types/pg": "^8.6.1",

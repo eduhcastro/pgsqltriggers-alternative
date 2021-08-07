@@ -1,4 +1,4 @@
-import { ConfigTriggerDB, CreateTriggers } from './'
+import { ConfigTriggerDB, CreateTriggers } from '../index'
 
 (async function() {
 
@@ -14,7 +14,7 @@ import { ConfigTriggerDB, CreateTriggers } from './'
   const create = await CreateTriggers({
       conexao,
       script: `BEGIN
-  INSERT INTO usersdetails (usery) VALUES (NEW.name);
+  INSERT INTO usersdetails (username) VALUES (NEW.name);
   RETURN NULL;
   END;`,
       scriptOpts: {
