@@ -1,7 +1,7 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.1.1",
-  "main": "index.js",
+  "version": "0.1.2",
+  "main": "build/index.js",
   "repository": "https://github.com/skillerm/pgsqltriggers-alternative.git",
   "author": "Eduardo Castro <projecflex@gmail.com>",
   "license": "MIT",
@@ -14,8 +14,7 @@
   "devDependencies": {
     "@types/pg": "^8.6.1",
     "ts-node-dev": "^1.1.8",
-    "typescript": "^4.3.5",
-    "pg": "^8.7.1"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "pg": "^8.7.1"

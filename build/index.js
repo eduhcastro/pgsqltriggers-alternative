@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Create = exports.ConfigDB = void 0;
+exports.ConfigTriggerDB = exports.CreateTriggers = exports.ConfigDB = void 0;
 var pg_1 = require("pg");
 var actions = ['insert', 'update', 'delete'];
 var myActions = [];
@@ -47,6 +47,7 @@ var ConfigDB = function (data) {
     return new pg_1.Pool(data);
 };
 exports.ConfigDB = ConfigDB;
+exports.ConfigTriggerDB = exports.ConfigDB;
 var scanConfig = function (arrs) {
     if (typeof arrs !== 'object') {
         throw new Error('Expected an object');
@@ -148,4 +149,5 @@ var Create = function (config) { return __awaiter(void 0, void 0, void 0, functi
         return [2 /*return*/];
     });
 }); };
-exports.Create = Create;
+exports.CreateTriggers = Create;
+//# sourceMappingURL=index.js.map
