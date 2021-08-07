@@ -1,10 +1,19 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.1.2",
+  "version": "0.1.2.9",
   "main": "build/index.js",
-  "repository": "https://github.com/skillerm/pgsqltriggers-alternative.git",
-  "author": "Eduardo Castro <projecflex@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/skillerm/pgsqltriggers-alternative.git"
+  },
+  "author": "Eduardo Castro",
   "license": "MIT",
+  "keywords": [
+    "pgsql",
+    "triggers"
+  ],
+  "homepage": "https://github.com/skillerm/pgsqltriggers-alternative#readme",
+  "bugs": "https://github.com/skillerm/pgsqltriggers-alternative/issues",
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
