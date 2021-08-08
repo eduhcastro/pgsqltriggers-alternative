@@ -1,6 +1,6 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "main": "build/index.js",
   "repository": {
     "type": "git",
@@ -10,7 +10,11 @@
   "license": "MIT",
   "keywords": [
     "pgsql",
-    "triggers"
+    "postgresql",
+    "triggers",
+    "postgres",
+    "functions",
+    "changes"
   ],
   "homepage": "https://github.com/skillerm/pgsqltriggers-alternative#readme",
   "bugs": "https://github.com/skillerm/pgsqltriggers-alternative/issues",

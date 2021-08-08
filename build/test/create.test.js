@@ -51,16 +51,18 @@ var index_1 = require("../index");
                     };
                     conexao = index_1.ConfigTriggerDB(database);
                     return [4 /*yield*/, index_1.CreateTriggers({
-                            conexao: conexao,
-                            script: "BEGIN\n  INSERT INTO usersdetails (username) VALUES (NEW.name);\n  RETURN NULL;\n  END;",
-                            scriptOpts: {
-                                action: 'insert,update',
-                                fromTable: 'users'
-                            }
+                            pool: conexao,
+                            scripts: [
+                                { code: "INSERT INTO usersdetails (username) VALUES (NEW.name)", action: "INSERT", targetTable: "users" }
+                            ],
+                            scriptsOpts: {
+                                extensive: false
+                            },
+                            restrict: true
                         })];
                 case 1:
                     create = _a.sent();
-                    console.log(create);
+                    console.log({ create: create });
                     return [2 /*return*/];
             }
         });

@@ -107,3 +107,4 @@ dist
 .editorconfig
 .yarn.lock
 .backup.rar
+.yarn.lock

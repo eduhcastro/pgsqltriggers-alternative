@@ -1,4 +1,7 @@
-import { ConfigTriggerDB, CreateTriggers } from '../index'
+import {
+  ConfigTriggerDB,
+  CreateTriggers
+} from '../index'
 
 (async function() {
 
@@ -11,18 +14,18 @@ import { ConfigTriggerDB, CreateTriggers } from '../index'
 
   const conexao = ConfigTriggerDB(database)
 
+
   const create = await CreateTriggers({
-      conexao,
-      script: `BEGIN
-  INSERT INTO usersdetails (username) VALUES (NEW.name);
-  RETURN NULL;
-  END;`,
-      scriptOpts: {
-          action: 'insert,update',
-          fromTable: 'users'
-      }
+      pool: conexao,
+      scripts: [{
+          code: "INSERT INTO usersdetails (username) VALUES (NEW.name)",
+          action: "INSERT",
+          targetTable: "users"
+      }],
+      scriptsOpts: {
+          extensive: false
+      },
+      restrict: true
   })
   console.log(create)
 })()
-
-
