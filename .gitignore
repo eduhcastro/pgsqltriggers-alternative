@@ -104,7 +104,7 @@ dist
 .tern-port
 
 
-.editorconfig
-.yarn.lock
-.backup.rar
-.yarn.lock
+editorconfig
+yarn.lock
+backup.rar
+CODE_OF_CONDUCT.md

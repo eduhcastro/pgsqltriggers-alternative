@@ -39,10 +39,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../index");
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var database, conexao, create;
+        var database, conexao, create, e_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
+                    _a.trys.push([0, 2, , 3]);
                     database = {
                         host: 'localhost',
                         user: 'postgres',
@@ -52,9 +53,13 @@ var index_1 = require("../index");
                     conexao = index_1.ConfigTriggerDB(database);
                     return [4 /*yield*/, index_1.CreateTriggers({
                             pool: conexao,
-                            scripts: [
-                                { code: "INSERT INTO usersdetails (username) VALUES (NEW.name)", action: "INSERT", targetTable: "users" }
-                            ],
+                            scripts: [{
+                                    code: "INSERT INTO usersdetails (username) VALUES (NEW.name)",
+                                    action: "INSERT",
+                                    targetTable: "users",
+                                    functionName: "mytiggerinsert_function",
+                                    tiggerName: "mytiggerinsert_identifier"
+                                }],
                             scriptsOpts: {
                                 extensive: false
                             },
@@ -62,8 +67,13 @@ var index_1 = require("../index");
                         })];
                 case 1:
                     create = _a.sent();
-                    console.log({ create: create });
-                    return [2 /*return*/];
+                    console.log(create);
+                    return [3 /*break*/, 3];
+                case 2:
+                    e_1 = _a.sent();
+                    console.log(e_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
             }
         });
     });

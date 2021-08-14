@@ -3,18 +3,30 @@ interface Iscripts {
      * @param {string} code
      * @description Script for trigger according to PGSQL Trigger Procedures
      */
-    code?: string | undefined;
+    code: string | undefined;
     /**
      * @param {string} action
      * @description Action for trigger
      * @examples INSERT,UPDATE,DELETE
      */
-    action?: string | undefined;
+    action: string | undefined;
     /**
      * @param {string} targetTable
      * @description Target table for trigger
      */
     targetTable: string | undefined;
+    /**
+     * @param {string} functionName
+     * @description Name of the function
+     * @examples myfunction_trigger_insert, myfunction_trigger_update, myfunction_trigger_delete
+     */
+    functionName?: string | undefined;
+    /**
+     * @param {string} tiggerName
+     * @description Name of the trigger
+     * @examples mytrigger_insert, mytrigger_update, mytrigger_delete
+     */
+    tiggerName?: string | undefined;
 }
 interface PGSQLTriggers {
     /**
@@ -55,11 +67,11 @@ interface PGSQLTriggers {
      */
     restrict?: boolean | true;
 }
-export declare const ConfigDB: (data: {
+declare const ConfigDB: (data: {
     host: string;
     user: string;
     database: string;
     password: string;
 }) => object;
-declare const Create: (config?: PGSQLTriggers | undefined) => Promise<unknown>;
+declare const Create: (config: PGSQLTriggers) => Promise<unknown>;
 export { Create as CreateTriggers, ConfigDB as ConfigTriggerDB };

@@ -36,33 +36,59 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ConfigTriggerDB = exports.CreateTriggers = exports.ConfigDB = void 0;
+exports.ConfigTriggerDB = exports.CreateTriggers = void 0;
 var pg_1 = require("pg");
 var actions = ['INSERT', 'UPDATE', 'DELETE'];
+var params = ["action", "code", "targetTable"];
 var scanConfig = function (arrs) {
     if (typeof arrs === 'undefined') {
-        return new Error('config is undefined');
+        throw Error('config is undefined');
+    }
+    if (typeof arrs.pool === 'undefined') {
+        throw Error('argument pool required');
     }
     if (typeof arrs !== 'object') {
-        return new Error('Expected an object');
+        throw Error('Expected an object');
     }
     if (typeof arrs.scriptsOpts === 'undefined' && typeof arrs.tables === 'undefined') {
-        return new Error('Expected a table or scripts');
+        throw Error('Expected a table or scripts');
     }
     if (typeof arrs.scripts !== 'undefined') {
         if (typeof arrs.tables !== 'undefined') {
-            return new Error('It is not possible to use a script and option tables at the same time');
+            throw Error('It is not possible to use a script and option tables at the same time');
         }
         if (typeof arrs.scripts !== 'object') {
-            return new Error('Expected an object in scripts');
+            throw Error('Expected an object in scripts');
         }
         if (arrs.scripts.length === 0) {
-            return new Error('Expected at least one script');
+            throw Error('Expected at least one script');
         }
+        arrs.scripts.map(function (teste) {
+            for (var _i = 0, params_1 = params; _i < params_1.length; _i++) {
+                var arr = params_1[_i];
+                if (Object.keys(teste).indexOf(arr) === -1)
+                    throw Error('The parameter is missing : ' + arr + ' in ' + JSON.stringify(teste));
+            }
+            return true;
+        });
     }
     if (typeof arrs.tables !== 'undefined' && typeof arrs.tables !== 'object') {
-        return new Error('Expected an array object in argument tables');
+        throw Error('Expected an array object in argument tables');
     }
+};
+var customFunctionName = function (c, name) {
+    if (typeof c === 'undefined')
+        return "" + name;
+    if (String(c).length < 1)
+        throw Error('Invalid custom function name');
+    return c;
+};
+var customTriggerName = function (c, name) {
+    if (typeof c === 'undefined')
+        return "" + name;
+    if (String(c).length < 1)
+        throw Error('Invalid custom trigger name');
+    return c;
 };
 var ConfigDB = function (data) {
     if (!data.user && !data.password && !data.host && !data.database) {
@@ -70,8 +96,7 @@ var ConfigDB = function (data) {
     }
     return new pg_1.Pool(data);
 };
-exports.ConfigDB = ConfigDB;
-exports.ConfigTriggerDB = exports.ConfigDB;
+exports.ConfigTriggerDB = ConfigDB;
 var executeQuery = function (pool, query, callback) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -102,9 +127,9 @@ var buildFunctions = function (scripts, config) {
     for (var _i = 0, scripts_1 = scripts; _i < scripts_1.length; _i++) {
         var script = scripts_1[_i];
         if (actions.indexOf(script.action.toUpperCase()) === -1)
-            return new Error("Invalid action : " + script.action);
+            throw Error("Invalid action : " + script.action);
         if (!type) {
-            scriptReturn += "\n    " + restrict + " FUNCTION trigger_" + script.action.toLowerCase() + "_" + script.targetTable + "() RETURNS trigger AS $$\n    BEGIN\n    " + script.code + ";\n    RETURN NULL;\n    END;\n   $$ LANGUAGE plpgsql;\n  ";
+            scriptReturn += restrict + " FUNCTION " + customFunctionName(script.functionName, 'trigger_' + script.action.toLowerCase() + '_' + script.targetTable) + "() RETURNS trigger AS $$\n            BEGIN\n            " + script.code + ";\n            RETURN NULL;\n            END;\n            $$ LANGUAGE plpgsql;";
         }
         else {
             scriptReturn += script.code;
@@ -114,50 +139,51 @@ var buildFunctions = function (scripts, config) {
 };
 var buildTriggers = function (opts) {
     if (typeof opts === 'undefined')
-        return new Error('Invalid build triggers arguments');
+        throw Error('Invalid build triggers arguments');
     if (typeof opts.scripts === 'undefined')
         return;
     var triggers = '';
+    var restrict = function (r, scripts, iden) {
+        if (r) {
+            return "DROP TRIGGER IF EXISTS " + customTriggerName(scripts.tiggerName, scripts.targetTable + iden) + " ON " + scripts.targetTable + ";";
+        }
+        return '';
+    };
     for (var _i = 0, _a = opts.scripts; _i < _a.length; _i++) {
         var scripts = _a[_i];
         if (scripts.action.toUpperCase() === 'INSERT') {
-            triggers += "\n    DROP TRIGGER IF EXISTS " + scripts.targetTable + "_notify_insert ON " + scripts.targetTable + ";\n    CREATE TRIGGER " + scripts.targetTable + "_notify_insert AFTER INSERT ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n    trigger_insert_" + scripts.targetTable + "();\n    ";
+            triggers += restrict(scripts.restrict, scripts, '_identifytg_insert') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_insert') + " AFTER INSERT ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable) + "();";
         }
         if (scripts.action.toUpperCase() === 'UPDATE') {
-            triggers += "\n    DROP TRIGGER IF EXISTS " + scripts.targetTable + "_notify_update ON " + scripts.targetTable + ";\n    CREATE TRIGGER " + scripts.targetTable + "_notify_update AFTER UPDATE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n    trigger_update_" + scripts.targetTable + "();\n    ";
+            triggers += restrict(scripts.restrict, scripts, '_identifytg_update') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_update') + " AFTER UPDATE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable) + "();";
         }
         if (scripts.action.toUpperCase() === 'DELETE') {
-            triggers += "\n    DROP TRIGGER IF EXISTS " + scripts.targetTable + "_notify_delete ON " + scripts.targetTable + ";\n    CREATE TRIGGER " + scripts.targetTable + "_notify_delete AFTER DELETE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n    trigger_delete_" + scripts.targetTable + "();\n    ";
+            triggers += restrict(scripts.restrict, scripts, '_identifytg_delete') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_delete') + " AFTER DELETE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable) + "();";
         }
     }
     return triggers;
 };
-var buildExecute = function (functions, triggers) {
-    return "\n" + functions + "\n" + triggers + "\n";
+var buildPrepare = function (functions, triggers) {
+    return "\n    " + functions + "\n    " + triggers;
 };
 var Create = function (config) { return __awaiter(void 0, void 0, void 0, function () {
-    var Scan, triggersFunctions, triggersScript;
+    var triggersFunctions, triggersScript;
     return __generator(this, function (_a) {
-        Scan = scanConfig(config);
-        if (Scan instanceof Error)
-            return [2 /*return*/, Scan];
-        if (typeof config === 'undefined')
-            return [2 /*return*/, new Error('invalid config')];
-        if (typeof config.pool === 'undefined')
-            return [2 /*return*/, new Error('argument pool required')];
-        if (buildFunctions(config.scripts, config) instanceof Error)
-            return [2 /*return*/, buildFunctions(config.scripts, config)];
+        /**
+         * Checking if all parameters were filled in correctly.
+         */
+        scanConfig(config);
         triggersFunctions = buildFunctions(config.scripts, config);
         triggersScript = buildTriggers(config);
         return [2 /*return*/, new Promise(function (resolve, reject) {
-                executeQuery(config.pool, buildExecute(triggersFunctions, triggersScript), function (a, b) {
+                executeQuery(config.pool, buildPrepare(triggersFunctions, triggersScript), function (a, b) {
                     if (a) {
                         return reject(a);
                     }
                     return resolve(b);
                 });
-            }).catch(function (error) {
-                return error;
+            }).catch(function (e) {
+                throw Error(e);
             })];
     });
 }); };
