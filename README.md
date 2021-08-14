@@ -39,7 +39,7 @@ try {
                 code: "DELETE FROM usersdetails WHERE username = OLD.name",
                 action: "DELETE",
                 targetTable: "users",
-                tiggerName: "deleteuserdetails_action"
+                triggerName: "deleteuserdetails_action"
             }],
         scriptsOpts: {
             extensive: false
@@ -67,7 +67,7 @@ TriggersPG.CreateTriggers({
        action: string,       // ->  INSERT|UPDATE|DELETE,
        targetTable: string,  // ->  Table name corresponding to actions,
        functionName: string, // ->  Optional @default: "trigger_action_targetTable"
-       tiggerName: string    // ->  Optional @default: "targetTable_identifytg_action"
+       triggerName: string    // ->  Optional @default: "targetTable_identifytg_action"
        }],
       scriptsOpts: {        // -> Optional
           extensive: false  // -> @default : false | If you want for your own complete query, put it as true
@@ -91,15 +91,15 @@ TriggersPG.CreateTriggers({
 ```
 When the value is false your code is embedded in a ready-to-run query
 
-## <h4>TiggerName and FunctionName examples</h4>
-Now you can customize your tigger's function name and tag!
+## <h4>triggerName and FunctionName examples</h4>
+Now you can customize your trigger's function name and tag!
 ```javascript
 scripts: [{
           code: "INSERT INTO usersdetails (username) VALUES (NEW.name)",
           action: "INSERT",
           targetTable: "users",
           functionName: "mytiggerinsert_function",
-          tiggerName: "mytiggerinsert_identifier"
+          triggerName: "mytiggerinsert_identifier"
       }],
 ```
 Result: </br>

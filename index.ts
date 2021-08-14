@@ -31,11 +31,11 @@ interface Iscripts {
     functionName?: string | undefined
 
     /**
-     * @param {string} tiggerName
+     * @param {string} triggerName
      * @description Name of the trigger
      * @examples mytrigger_insert, mytrigger_update, mytrigger_delete
      */
-    tiggerName?: string | undefined
+    triggerName?: string | undefined
 
 }
 
@@ -210,7 +210,7 @@ const buildTriggers = (opts?: any) => {
 
     const restrict = (r: boolean, scripts: any, iden: string) => {
         if (r) {
-            return `DROP TRIGGER IF EXISTS ${customTriggerName(scripts.tiggerName, scripts.targetTable + iden)} ON ${scripts.targetTable};`
+            return `DROP TRIGGER IF EXISTS ${customTriggerName(scripts.triggerName, scripts.targetTable + iden)} ON ${scripts.targetTable};`
         }
         return ''
     }
@@ -219,19 +219,19 @@ const buildTriggers = (opts?: any) => {
 
         if (scripts.action.toUpperCase() === 'INSERT') {
             triggers += `${restrict(scripts.restrict, scripts, '_identifytg_insert')}
-            CREATE TRIGGER ${customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_insert')} AFTER INSERT ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
+            CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_insert')} AFTER INSERT ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable)}();`
         }
 
         if (scripts.action.toUpperCase() === 'UPDATE') {
             triggers += `${restrict(scripts.restrict, scripts, '_identifytg_update')}
-            CREATE TRIGGER ${customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_update')} AFTER UPDATE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
+            CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_update')} AFTER UPDATE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable)}();`
         }
 
         if (scripts.action.toUpperCase() === 'DELETE') {
             triggers += `${restrict(scripts.restrict, scripts, '_identifytg_delete')}
-            CREATE TRIGGER ${customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_delete')} AFTER DELETE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
+            CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_delete')} AFTER DELETE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable)}();`
         }
     }
