@@ -1,5 +1,7 @@
-# pgsqltriggers-alternative
+# pgsqltriggers-alternative ![Build Status](https://api.travis-ci.org/klaemo/postgres-triggers.svg)
 Create triggers for your Postgres database in a simple and fast way.
+
+[![NPM](https://nodei.co/npm/pgsqltriggers-alternative.png)](https://nodei.co/npm/pgsqltriggers-alternative/)
 
 # <h3>Observe</h3>
 * Control your trigger creations, with restrict, to replace or not existing triggers
@@ -7,7 +9,16 @@ Create triggers for your Postgres database in a simple and fast way.
 * Don't worry, if you try to add a script similar to an existing one, Postgre will warn you!
 
 
-## In practice
+## Installation
+
+First you need to install `pg` package: </br>
+```npm i pg```
+
+
+Now you can install: </br>
+```npm i pgsqltriggers-alternative```
+
+## In practice:
 
 ```javascript
 const TriggersPG = require('pgsqltriggers-alternative')
@@ -56,7 +67,7 @@ try {
 
 The codes above are directed to actions in the "users" table
 
-## Payload
+## Payload:
 
 
 ```javascript
@@ -78,7 +89,7 @@ TriggersPG.CreateTriggers({
 
 ## <h4>Extensive examples</h4>
 <span>True:</span>
-```javascript
+```sql
 { code: `CREATE FUNCTION trigger_function_name() RETURNS event_trigger AS $$
       BEGIN
         RAISE NOTICE 'funtion: % %', tg_event, tg_tag;
@@ -102,5 +113,5 @@ scripts: [{
           triggerName: "mytiggerinsert_identifier"
       }],
 ```
-Result: </br>
+And the result is: </br>
 <img src="https://i.ibb.co/qR07m18/Example.jpg">
