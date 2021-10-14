@@ -1,4 +1,4 @@
-# pgsqltriggers-alternative ![Build Status](https://api.travis-ci.org/klaemo/postgres-triggers.svg)
+# pgsqltriggers-alternative
 Create triggers for your Postgres database in a simple and fast way.
 
 [![NPM](https://nodei.co/npm/pgsqltriggers-alternative.png)](https://nodei.co/npm/pgsqltriggers-alternative/)
