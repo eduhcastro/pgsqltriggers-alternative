@@ -22,11 +22,11 @@ interface Iscripts {
      */
     functionName?: string | undefined;
     /**
-     * @param {string} tiggerName
+     * @param {string} triggerName
      * @description Name of the trigger
      * @examples mytrigger_insert, mytrigger_update, mytrigger_delete
      */
-    tiggerName?: string | undefined;
+    triggerName?: string | undefined;
 }
 interface PGSQLTriggers {
     /**

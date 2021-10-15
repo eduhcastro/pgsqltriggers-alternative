@@ -215,30 +215,36 @@ const buildTriggers = (opts?: any) => {
         return ''
     }
 
-    for (let scripts of opts.scripts) {
+    if (!opts.scriptsOpts.extensive) {
+        for (let scripts of opts.scripts) {
 
-        if (scripts.action.toUpperCase() === 'INSERT') {
-            triggers += `${restrict(scripts.restrict, scripts, '_identifytg_insert')}
+            if (scripts.action.toUpperCase() === 'INSERT') {
+                triggers += `${restrict(scripts.restrict, scripts, '_identifytg_insert')}
             CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_insert')} AFTER INSERT ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable)}();`
-        }
+            }
 
-        if (scripts.action.toUpperCase() === 'UPDATE') {
-            triggers += `${restrict(scripts.restrict, scripts, '_identifytg_update')}
+            if (scripts.action.toUpperCase() === 'UPDATE') {
+                triggers += `${restrict(scripts.restrict, scripts, '_identifytg_update')}
             CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_update')} AFTER UPDATE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable)}();`
-        }
+            }
 
-        if (scripts.action.toUpperCase() === 'DELETE') {
-            triggers += `${restrict(scripts.restrict, scripts, '_identifytg_delete')}
+            if (scripts.action.toUpperCase() === 'DELETE') {
+                triggers += `${restrict(scripts.restrict, scripts, '_identifytg_delete')}
             CREATE TRIGGER ${customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_delete')} AFTER DELETE ON ${scripts.targetTable} FOR EACH ROW EXECUTE PROCEDURE
             ${customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable)}();`
+            }
         }
     }
     return triggers
 }
 
 const buildPrepare = (functions: any, triggers: any) => {
+    console.log({
+        functions,
+        triggers
+    })
     return `
     ${functions}
     ${triggers}`

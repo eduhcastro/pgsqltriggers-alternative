@@ -37,44 +37,85 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("../index");
+var pg_1 = require("pg");
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var database, conexao, create, e_1;
+        var ConfigDB, CreateTables, database, conexao_1;
+        var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    database = {
-                        host: 'localhost',
-                        user: 'postgres',
-                        database: 'Teste',
-                        password: '123456'
-                    };
-                    conexao = index_1.ConfigTriggerDB(database);
-                    return [4 /*yield*/, index_1.CreateTriggers({
-                            pool: conexao,
-                            scripts: [{
-                                    code: "INSERT INTO usersdetails (username) VALUES (NEW.name)",
-                                    action: "INSERT",
-                                    targetTable: "users",
-                                    functionName: "mytiggerinsert_function",
-                                    tiggerName: "mytiggerinsert_identifier"
-                                }],
-                            scriptsOpts: {
-                                extensive: false
-                            },
-                            restrict: true
-                        })];
-                case 1:
-                    create = _a.sent();
-                    console.log(create);
-                    return [3 /*break*/, 3];
-                case 2:
-                    e_1 = _a.sent();
-                    console.log(e_1);
-                    return [3 /*break*/, 3];
-                case 3: return [2 /*return*/];
+            try {
+                ConfigDB = function (data) {
+                    if (!data.user && !data.password && !data.host && !data.database) {
+                        throw new Error("config is invalid");
+                    }
+                    return new pg_1.Pool(data);
+                };
+                CreateTables = function (pool, query, callback) { return __awaiter(_this, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, pool.connect(function (err, client, release) {
+                                    if (err) {
+                                        return callback(err);
+                                    }
+                                    client.query(query, function (err, result) {
+                                        if (err) {
+                                            return callback(err);
+                                        }
+                                        release();
+                                        return callback(err, result);
+                                    });
+                                })];
+                            case 1:
+                                _a.sent();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); };
+                database = {
+                    host: "localhost",
+                    user: "postgres",
+                    database: "travis_ci_test",
+                    password: "123456",
+                };
+                conexao_1 = (0, index_1.ConfigTriggerDB)(database);
+                CreateTables(ConfigDB(database), "CREATE TABLE IF NOT EXISTS table_a (id bigserial primary key, name varchar(20));\n         CREATE TABLE IF NOT EXISTS table_b (id bigserial primary key, account_name varchar(20));", function (a, b) {
+                    return __awaiter(this, void 0, void 0, function () {
+                        var create;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (a) {
+                                        console.log("ERROR:" + a);
+                                    }
+                                    return [4 /*yield*/, (0, index_1.CreateTriggers)({
+                                            pool: conexao_1,
+                                            scripts: [
+                                                {
+                                                    code: "INSERT INTO table_b (account_name) VALUES (NEW.name)",
+                                                    action: "INSERT",
+                                                    targetTable: "table_a",
+                                                    functionName: "mytriggerinsert_function",
+                                                    triggerName: "mytriggerinsert_identifier",
+                                                },
+                                            ],
+                                            scriptsOpts: {
+                                                extensive: false,
+                                            },
+                                            restrict: true,
+                                        })];
+                                case 1:
+                                    create = _a.sent();
+                                    console.log({ create: create });
+                                    return [2 /*return*/];
+                            }
+                        });
+                    });
+                });
             }
+            catch (e) {
+                console.log("ERROR:" + e);
+            }
+            return [2 /*return*/];
         });
     });
 })();

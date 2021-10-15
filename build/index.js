@@ -145,25 +145,31 @@ var buildTriggers = function (opts) {
     var triggers = '';
     var restrict = function (r, scripts, iden) {
         if (r) {
-            return "DROP TRIGGER IF EXISTS " + customTriggerName(scripts.tiggerName, scripts.targetTable + iden) + " ON " + scripts.targetTable + ";";
+            return "DROP TRIGGER IF EXISTS " + customTriggerName(scripts.triggerName, scripts.targetTable + iden) + " ON " + scripts.targetTable + ";";
         }
         return '';
     };
-    for (var _i = 0, _a = opts.scripts; _i < _a.length; _i++) {
-        var scripts = _a[_i];
-        if (scripts.action.toUpperCase() === 'INSERT') {
-            triggers += restrict(scripts.restrict, scripts, '_identifytg_insert') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_insert') + " AFTER INSERT ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable) + "();";
-        }
-        if (scripts.action.toUpperCase() === 'UPDATE') {
-            triggers += restrict(scripts.restrict, scripts, '_identifytg_update') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_update') + " AFTER UPDATE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable) + "();";
-        }
-        if (scripts.action.toUpperCase() === 'DELETE') {
-            triggers += restrict(scripts.restrict, scripts, '_identifytg_delete') + "\n            CREATE TRIGGER " + customTriggerName(scripts.tiggerName, scripts.targetTable + '_identifytg_delete') + " AFTER DELETE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable) + "();";
+    if (!opts.scriptsOpts.extensive) {
+        for (var _i = 0, _a = opts.scripts; _i < _a.length; _i++) {
+            var scripts = _a[_i];
+            if (scripts.action.toUpperCase() === 'INSERT') {
+                triggers += restrict(scripts.restrict, scripts, '_identifytg_insert') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_insert') + " AFTER INSERT ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable) + "();";
+            }
+            if (scripts.action.toUpperCase() === 'UPDATE') {
+                triggers += restrict(scripts.restrict, scripts, '_identifytg_update') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_update') + " AFTER UPDATE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable) + "();";
+            }
+            if (scripts.action.toUpperCase() === 'DELETE') {
+                triggers += restrict(scripts.restrict, scripts, '_identifytg_delete') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_delete') + " AFTER DELETE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable) + "();";
+            }
         }
     }
     return triggers;
 };
 var buildPrepare = function (functions, triggers) {
+    console.log({
+        functions: functions,
+        triggers: triggers
+    });
     return "\n    " + functions + "\n    " + triggers;
 };
 var Create = function (config) { return __awaiter(void 0, void 0, void 0, function () {

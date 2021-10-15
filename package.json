@@ -1,6 +1,6 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "main": "build/index.js",
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "start": "node build/index.js",
     "dev": "ts-node-dev --ignore-watch node_modules index.ts",
     "test": "ts-node-dev --ignore-watch node_modules test/create.test.ts",
+    "test-extensive-on": "ts-node-dev --ignore-watch node_modules examples/extensiveOn/create.ts",
     "testbuild":  "node build/test/create.test.js"
   },
   "devDependencies": {
