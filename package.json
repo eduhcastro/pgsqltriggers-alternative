@@ -1,6 +1,6 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "build/index.js",
   "repository": {
     "type": "git",
