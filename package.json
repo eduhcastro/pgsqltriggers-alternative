@@ -1,10 +1,13 @@
 {
   "name": "pgsqltriggers-alternative",
-  "version": "0.2.1",
+  "version": "0.2.1.1",
   "main": "build/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/eduhcastro/pgsqltriggers-alternative.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "author": "Eduardo Castro",
   "license": "MIT",
