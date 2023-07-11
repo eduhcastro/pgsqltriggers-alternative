@@ -4,7 +4,7 @@
   "main": "build/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/skillerm/pgsqltriggers-alternative.git"
+    "url": "https://github.com/eduhcastro/pgsqltriggers-alternative.git"
   },
   "author": "Eduardo Castro",
   "license": "MIT",
@@ -16,8 +16,8 @@
     "functions",
     "changes"
   ],
-  "homepage": "https://github.com/skillerm/pgsqltriggers-alternative#readme",
-  "bugs": "https://github.com/skillerm/pgsqltriggers-alternative/issues",
+  "homepage": "https://github.com/eduhcastro/pgsqltriggers-alternative#readme",
+  "bugs": "https://github.com/eduhcastro/pgsqltriggers-alternative/issues",
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",

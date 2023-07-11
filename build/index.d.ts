@@ -1,77 +1,82 @@
-interface Iscripts {
+/**
+ * Interface for defining trigger scripts.
+ */
+interface IScript {
     /**
-     * @param {string} code
-     * @description Script for trigger according to PGSQL Trigger Procedures
+     * Script code for the trigger according to PGSQL Trigger Procedures.
      */
     code: string | undefined;
     /**
-     * @param {string} action
-     * @description Action for trigger
-     * @examples INSERT,UPDATE,DELETE
+     * Action for the trigger.
+     * Valid actions are INSERT, UPDATE, DELETE.
      */
     action: string | undefined;
     /**
-     * @param {string} targetTable
-     * @description Target table for trigger
+     * Target table for the trigger.
      */
     targetTable: string | undefined;
     /**
-     * @param {string} functionName
-     * @description Name of the function
-     * @examples myfunction_trigger_insert, myfunction_trigger_update, myfunction_trigger_delete
+     * Optional name of the function.
      */
     functionName?: string | undefined;
     /**
-     * @param {string} triggerName
-     * @description Name of the trigger
-     * @examples mytrigger_insert, mytrigger_update, mytrigger_delete
+     * Optional name of the trigger.
      */
     triggerName?: string | undefined;
 }
+/**
+ * Interface for PGSQL Triggers configuration.
+ */
 interface PGSQLTriggers {
     /**
-     * @argument {string} name
-     * @description Add a name for your trigger functions
+     * Add a name for your trigger functions.
      */
     name?: string | undefined;
     /**
-     * @argument {any} pool
-     * @description Add a pool for your database
+     * Add a pool for your database.
      */
     pool?: any | undefined;
     /**
-     * @argument {string} script
-     * @description Add scripts for your trigger functions
+     * Add scripts for your trigger functions.
      */
-    scripts?: Array<Iscripts> | undefined;
+    scripts?: Array<IScript> | undefined;
     /**
-     * @argument {object} scriptOpts
-     * @description Options for your extensive script
+     * Options for your extensive script.
      */
     scriptsOpts?: {
         /**
-         * @argument {boolean} extensive
-         * @description Define whether your script is simple or complex code
-         * @default false
+         * Define whether your script is simple or complex code.
+         * Default is false.
          */
         extensive: boolean | false;
     } | undefined;
     /**
-     * @argument {Array< object >} tables
-     * @description Soon.
+     * Soon.
      */
     tables?: Array<object> | undefined;
     /**
-     * @argument {boolean} restrict
-     * @description Defines the property level of the query, if true, it will not be possible to override triggers and functions with the same name
+     * Defines the property level of the query.
+     * If true, it will not be possible to override triggers and functions with the same name.
      */
     restrict?: boolean | true;
 }
+/**
+ * Configures the database connection pool.
+ * @param data Configuration data for the database connection.
+ * @returns Database connection pool object.
+ * @throws Error if the configuration data is invalid.
+ */
 declare const ConfigDB: (data: {
     host: string;
     user: string;
     database: string;
     password: string;
 }) => object;
+/**
+ * Creates triggers in the database based on the provided configuration.
+ * @param config Configuration for creating triggers.
+ * @returns Promise that resolves when the triggers are created successfully.
+ * @throws Error if any required parameter is missing or if an error occurs during execution.
+ */
 declare const Create: (config: PGSQLTriggers) => Promise<unknown>;
 export { Create as CreateTriggers, ConfigDB as ConfigTriggerDB };
