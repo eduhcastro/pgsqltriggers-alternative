@@ -14,7 +14,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -38,8 +38,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigTriggerDB = exports.CreateTriggers = void 0;
 var pg_1 = require("pg");
+// List of valid trigger actions
 var actions = ['INSERT', 'UPDATE', 'DELETE'];
+// Required parameters for each script
 var params = ["action", "code", "targetTable"];
+/**
+ * Validates the configuration object.
+ * @param arrs Configuration object for PGSQL Triggers.
+ * @throws Error if any required parameter is missing or invalid.
+ */
 var scanConfig = function (arrs) {
     if (typeof arrs === 'undefined') {
         throw Error('config is undefined');
@@ -57,46 +64,74 @@ var scanConfig = function (arrs) {
         if (typeof arrs.tables !== 'undefined') {
             throw Error('It is not possible to use a script and option tables at the same time');
         }
-        if (typeof arrs.scripts !== 'object') {
-            throw Error('Expected an object in scripts');
+        if (!Array.isArray(arrs.scripts)) {
+            throw Error('Expected an array of scripts');
         }
         if (arrs.scripts.length === 0) {
             throw Error('Expected at least one script');
         }
-        arrs.scripts.map(function (teste) {
+        arrs.scripts.map(function (script) {
             for (var _i = 0, params_1 = params; _i < params_1.length; _i++) {
                 var arr = params_1[_i];
-                if (Object.keys(teste).indexOf(arr) === -1)
-                    throw Error('The parameter is missing : ' + arr + ' in ' + JSON.stringify(teste));
+                if (!script.hasOwnProperty(arr)) {
+                    throw Error('The parameter is missing: ' + arr + ' in ' + JSON.stringify(script));
+                }
             }
             return true;
         });
     }
-    if (typeof arrs.tables !== 'undefined' && typeof arrs.tables !== 'object') {
-        throw Error('Expected an array object in argument tables');
+    if (typeof arrs.tables !== 'undefined' && !Array.isArray(arrs.tables)) {
+        throw Error('Expected an array of objects in argument tables');
     }
 };
+/**
+ * Generates a custom function name based on the provided name or the default name.
+ * @param c Custom function name.
+ * @param name Default function name.
+ * @returns Generated function name.
+ * @throws Error if the custom function name is invalid.
+ */
 var customFunctionName = function (c, name) {
     if (typeof c === 'undefined')
-        return "" + name;
+        return "".concat(name);
     if (String(c).length < 1)
         throw Error('Invalid custom function name');
     return c;
 };
+/**
+ * Generates a custom trigger name based on the provided name or the default name.
+ * @param c Custom trigger name.
+ * @param name Default trigger name.
+ * @returns Generated trigger name.
+ * @throws Error if the custom trigger name is invalid.
+ */
 var customTriggerName = function (c, name) {
     if (typeof c === 'undefined')
-        return "" + name;
+        return "".concat(name);
     if (String(c).length < 1)
         throw Error('Invalid custom trigger name');
     return c;
 };
+/**
+ * Configures the database connection pool.
+ * @param data Configuration data for the database connection.
+ * @returns Database connection pool object.
+ * @throws Error if the configuration data is invalid.
+ */
 var ConfigDB = function (data) {
-    if (!data.user && !data.password && !data.host && !data.database) {
-        throw new Error('config is invalid');
+    if (!data.user || !data.password || !data.host || !data.database) {
+        throw new Error('Invalid configuration');
     }
     return new pg_1.Pool(data);
 };
 exports.ConfigTriggerDB = ConfigDB;
+/**
+ * Executes a database query using the provided connection pool.
+ * @param pool Database connection pool object.
+ * @param query Query to be executed.
+ * @param callback Callback function to handle the query result.
+ * @returns Promise that resolves with the query result.
+ */
 var executeQuery = function (pool, query, callback) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -118,18 +153,27 @@ var executeQuery = function (pool, query, callback) { return __awaiter(void 0, v
         }
     });
 }); };
+/**
+ * Builds the trigger functions based on the provided scripts and configuration.
+ * @param scripts Array of trigger scripts.
+ * @param config PGSQL Triggers configuration.
+ * @returns Generated trigger functions as a string.
+ * @throws Error if an invalid action is provided or the script type is not supported.
+ */
 var buildFunctions = function (scripts, config) {
+    var _a;
     if (typeof scripts === 'undefined')
-        return;
+        return '';
     var scriptReturn = '';
-    var type = config.scriptsOpts.extensive;
+    var type = (_a = config.scriptsOpts) === null || _a === void 0 ? void 0 : _a.extensive;
     var restrict = config.restrict ? 'CREATE ' : 'CREATE OR REPLACE';
     for (var _i = 0, scripts_1 = scripts; _i < scripts_1.length; _i++) {
         var script = scripts_1[_i];
-        if (actions.indexOf(script.action.toUpperCase()) === -1)
-            throw Error("Invalid action : " + script.action);
+        if (actions.indexOf(script.action.toUpperCase()) === -1) {
+            throw Error("Invalid action: " + script.action);
+        }
         if (!type) {
-            scriptReturn += restrict + " FUNCTION " + customFunctionName(script.functionName, 'trigger_' + script.action.toLowerCase() + '_' + script.targetTable) + "() RETURNS trigger AS $$\n            BEGIN\n            " + script.code + ";\n            RETURN NULL;\n            END;\n            $$ LANGUAGE plpgsql;";
+            scriptReturn += "".concat(restrict, " FUNCTION ").concat(customFunctionName(script.functionName, 'trigger_' + script.action.toLowerCase() + '_' + script.targetTable), "() RETURNS trigger AS $$\n            BEGIN\n            ").concat(script.code, ";\n            RETURN NULL;\n            END;\n            $$ LANGUAGE plpgsql;");
         }
         else {
             scriptReturn += script.code;
@@ -137,47 +181,65 @@ var buildFunctions = function (scripts, config) {
     }
     return scriptReturn;
 };
+/**
+ * Builds the trigger definitions based on the provided scripts and configuration.
+ * @param opts Configuration options for building triggers.
+ * @returns Generated trigger definitions as a string.
+ * @throws Error if an invalid argument is provided or scripts are not defined.
+ */
 var buildTriggers = function (opts) {
-    if (typeof opts === 'undefined')
+    var _a;
+    if (typeof opts === 'undefined') {
         throw Error('Invalid build triggers arguments');
+    }
     if (typeof opts.scripts === 'undefined')
-        return;
+        return '';
     var triggers = '';
     var restrict = function (r, scripts, iden) {
         if (r) {
-            return "DROP TRIGGER IF EXISTS " + customTriggerName(scripts.triggerName, scripts.targetTable + iden) + " ON " + scripts.targetTable + ";";
+            return "DROP TRIGGER IF EXISTS ".concat(customTriggerName(scripts.triggerName, scripts.targetTable + iden), " ON ").concat(scripts.targetTable, ";");
         }
         return '';
     };
-    if (!opts.scriptsOpts.extensive) {
-        for (var _i = 0, _a = opts.scripts; _i < _a.length; _i++) {
-            var scripts = _a[_i];
+    if (!((_a = opts.scriptsOpts) === null || _a === void 0 ? void 0 : _a.extensive)) {
+        for (var _i = 0, _b = opts.scripts; _i < _b.length; _i++) {
+            var scripts = _b[_i];
             if (scripts.action.toUpperCase() === 'INSERT') {
-                triggers += restrict(scripts.restrict, scripts, '_identifytg_insert') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_insert') + " AFTER INSERT ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable) + "();";
+                triggers += "".concat(restrict(scripts.restrict, scripts, '_identifytg_insert'), "\n            CREATE TRIGGER ").concat(customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_insert'), " AFTER INSERT ON ").concat(scripts.targetTable, " FOR EACH ROW EXECUTE PROCEDURE\n            ").concat(customFunctionName(scripts.functionName, 'trigger_insert_' + scripts.targetTable), "();");
             }
             if (scripts.action.toUpperCase() === 'UPDATE') {
-                triggers += restrict(scripts.restrict, scripts, '_identifytg_update') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_update') + " AFTER UPDATE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable) + "();";
+                triggers += "".concat(restrict(scripts.restrict, scripts, '_identifytg_update'), "\n            CREATE TRIGGER ").concat(customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_update'), " AFTER UPDATE ON ").concat(scripts.targetTable, " FOR EACH ROW EXECUTE PROCEDURE\n            ").concat(customFunctionName(scripts.functionName, 'trigger_update_' + scripts.targetTable), "();");
             }
             if (scripts.action.toUpperCase() === 'DELETE') {
-                triggers += restrict(scripts.restrict, scripts, '_identifytg_delete') + "\n            CREATE TRIGGER " + customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_delete') + " AFTER DELETE ON " + scripts.targetTable + " FOR EACH ROW EXECUTE PROCEDURE\n            " + customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable) + "();";
+                triggers += "".concat(restrict(scripts.restrict, scripts, '_identifytg_delete'), "\n            CREATE TRIGGER ").concat(customTriggerName(scripts.triggerName, scripts.targetTable + '_identifytg_delete'), " AFTER DELETE ON ").concat(scripts.targetTable, " FOR EACH ROW EXECUTE PROCEDURE\n            ").concat(customFunctionName(scripts.functionName, 'trigger_delete_' + scripts.targetTable), "();");
             }
         }
     }
     return triggers;
 };
+/**
+ * Builds the final script by combining trigger functions and trigger definitions.
+ * @param functions Generated trigger functions.
+ * @param triggers Generated trigger definitions.
+ * @returns Final script as a string.
+ */
 var buildPrepare = function (functions, triggers) {
     console.log({
         functions: functions,
         triggers: triggers
     });
-    return "\n    " + functions + "\n    " + triggers;
+    return "\n    ".concat(functions, "\n    ").concat(triggers);
 };
+/**
+ * Creates triggers in the database based on the provided configuration.
+ * @param config Configuration for creating triggers.
+ * @returns Promise that resolves when the triggers are created successfully.
+ * @throws Error if any required parameter is missing or if an error occurs during execution.
+ */
 var Create = function (config) { return __awaiter(void 0, void 0, void 0, function () {
     var triggersFunctions, triggersScript;
     return __generator(this, function (_a) {
-        /**
-         * Checking if all parameters were filled in correctly.
-         */
+        // Checking if all parameters were filled in correctly.
         scanConfig(config);
         triggersFunctions = buildFunctions(config.scripts, config);
         triggersScript = buildTriggers(config);
